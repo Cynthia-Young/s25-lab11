@@ -2,29 +2,46 @@ package edu.cmu.Weather;
 
 public class Weather {
     private WeatherService weatherService;
-    private boolean inches;
+    // private boolean inches;
 
     /**
-     * Sets the length scale for rainfall.
-     *
-     * @param inches if true, sets the scale to inches; if false, sets the scale to millimeters.
+     * Enumeration of possible length units for rainfall measurements.
      */
-    public void setLengthScale(boolean inches) {
-        this.inches = inches;
+    public enum LengthUnit {
+        INCHES,
+        MILLIMETERS
+    }
+
+    private LengthUnit unit = LengthUnit.MILLIMETERS; // Default to millimeters
+
+    /**
+     * Sets the length units for rainfall.
+     *
+     * @param unit The unit to use for rainfall measurements (INCHES or MILLIMETERS)
+     */
+    public void setLengthScale(LengthUnit unit) {
+        if (unit == null) {
+            throw new IllegalArgumentException("Length unit cannot be null");
+        }
+        this.unit = unit;
     }
 
     /**
      * Retrieves the rainfall measurement over the last 24 hours from the weather service in the preferred scale.
      * 
-     * @return the rainfall amount. If the measurement is in inches, it returns the value as is.
-     *         If the measurement is not in inches, it converts the value to millimeters.
+     * @return the rainfall amount in the preferred unit (as set by setLengthUnit).
+     *         The weather service provides data in millimeters, so conversion is performed
+     *         if INCHES is selected as the unit.
      */
     public double getRainfall() {
-        double wsRainfall = weatherService.getRainfall();
-        if (inches) {
-            return wsRainfall / 25.4;
+        double rainfallInMillimeters = weatherService.getRainfall();
+        if (unit == LengthUnit.INCHES) {
+            return rainfallInMillimeters / 25.4; // Convert millimeters to inches
         } else {
-            return wsRainfall;
+            return rainfallInMillimeters; // Return as is (in millimeters)
         }
     }
 }
+
+// U2. Be consistent
+// Q3. Make it easy for user to do what's preferable

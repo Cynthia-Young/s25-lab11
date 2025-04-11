@@ -11,11 +11,24 @@ public class LibraryAccount {
      *
      * @param userId the ID of the user whose books are to be retrieved
      * @return an array of Book objects the user has checked out
+     * @throws IllegalArgumentException if the userId is null, empty, or does not follow the required format
      */
     public Book[] getBooks(String userId) {
-        String[] parts = userId.split(":");
-        String name = parts[0];
-        String id = parts[1];
-        return libraryService.getBooks(name, id);        
+        if (userId == null || userId.trim().isEmpty()) {
+            throw new IllegalArgumentException("User ID cannot be null or empty");
+        }
+        int colonIndex = userId.indexOf(':');
+        if (colonIndex <= 0 || colonIndex == userId.length() - 1) {
+            throw new IllegalArgumentException("User ID must be in the format 'libraryID:userName'");
+        }
+        String libraryId = userId.substring(0, colonIndex);
+        String userName = userId.substring(colonIndex + 1);
+
+        return libraryService.getBooks(userName, libraryId);        
     }
 }
+
+// U1. Don't make users do anything library could do for them
+// U2. Be consistent
+// Q4. Prevent failure, or fail quickly, predictably, and informatively ("fail fast")
+// Q5. Handle boundary conditions (edge cases, corner cases) gracefully
